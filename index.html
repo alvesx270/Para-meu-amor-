@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para o Meu Amor ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #ff3366;
-            --secondary: #ff85a1;
             --bg: #f8edeb;
         }
 
@@ -20,6 +20,20 @@
             min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* Overlay para permitir o som após o primeiro clique */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: 0.5s;
         }
 
         .card {
@@ -31,28 +45,18 @@
             text-align: center;
             max-width: 350px;
             width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
             z-index: 10;
         }
 
-        h1 { color: var(--primary); font-size: 1.8rem; margin-bottom: 10px; }
-        p { color: #666; line-height: 1.5; }
-
         .heart-icon {
             font-size: 60px;
-            margin-bottom: 15px;
-            display: inline-block;
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
+            0%, 100% { transform: scale(1); }
             50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
         }
-
-        .btn-container { margin-top: 25px; }
 
         .btn {
             display: block;
@@ -64,15 +68,10 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            text-decoration: none;
+            background: var(--primary);
+            color: white;
             font-size: 15px;
         }
-
-        .btn-music { background: #1DB954; color: white; } /* Verde Spotify */
-        .btn-msg { background: var(--primary); color: white; }
-        .btn-hearts { background: white; color: var(--primary); border: 2px solid var(--primary); }
-
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); opacity: 0.9; }
 
         #msg-text {
             display: none;
@@ -82,47 +81,76 @@
             margin-top: 15px;
             font-style: italic;
             border-left: 5px solid var(--primary);
-            text-align: left;
-            animation: slideDown 0.5s ease-out;
+            animation: fadeIn 0.8s;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .floating-heart {
             position: absolute;
             pointer-events: none;
-            z-index: 1;
-            animation: float Up 4s linear forwards;
+            animation: floatUp 4s linear forwards;
         }
 
-        @keyframes floatUp {
-            to { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        @keyframes floatUp { to { transform: translateY(-110vh); opacity: 0; } }
+        
+        /* Esconder o player do Spotify mas deixá-lo funcional */
+        #spotify-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
         }
     </style>
 </head>
-<body>
+<body onclick="iniciarTudo()">
+
+    <div id="overlay">
+        <div class="heart-icon">💝</div>
+        <h2>Clica aqui, amor...</h2>
+    </div>
 
     <div class="card">
         <div class="heart-icon">💖</div>
         <h1>Oi, Vida!</h1>
-        <p>Preparei esse cantinho só para te lembrar o quanto você é especial para mim.</p>
+        <p>Esta música faz-me lembrar de nós cada vez que toca.</p>
         
-        <div class="btn-container">
-            <a href="https://open.spotify.com/track/70maGr0lQYDj0tcpcA2ORM?si=rM2Lqy7iQzOD0TAlriLDrg" target="_blank" class="btn btn-music">🎵 Ouvir nossa música</a>
-            
-            <button class="btn btn-msg" onclick="toggleMsg()">💌 Ler meu recado</button>
-            <button class="btn btn-hearts" onclick="rainHearts()">✨ Chuva de amor</button>
-        </div>
+        <button class="btn" onclick="toggleMsg()">💌 Ler o meu recado</button>
+        <button class="btn" style="background: white; color: var(--primary); border: 2px solid var(--primary);" onclick="rainHearts()">✨ Chuva de amor</button>
 
         <div id="msg-text">
-            "A cada detalhe seu, eu me apaixono um pouco mais. Obrigado por ser minha parceira e meu porto seguro. Te amo infinitamente! ❤️"
+            "Tu és a melhor parte do meu dia. Fiz este site para te mostrar que o meu amor por ti é maior que toda a internet! ❤️"
         </div>
     </div>
 
+    <iframe id="spotify-player" 
+        src="https://open.spotify.com/embed/track/1?utm_source=generator&autoplay=1" 
+        frameBorder="0" 
+        allowfullscreen="" 
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+        loading="lazy">
+    </iframe>
+
     <script>
+        let iniciado = false;
+
+        function iniciarTudo() {
+            if (!iniciado) {
+                // Remove a tela de bloqueio
+                document.getElementById('overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('overlay').style.display = 'none';
+                }, 500);
+
+                // Faz o Spotify dar "reload" com autoplay ativo
+                const player = document.getElementById('spotify-player');
+                player.src = player.src; // Força o refresh para tentar o autoplay
+                
+                rainHearts();
+                iniciado = true;
+            }
+        }
+
         function toggleMsg() {
             const msg = document.getElementById('msg-text');
             msg.style.display = (msg.style.display === 'block') ? 'none' : 'block';
@@ -132,7 +160,7 @@
             for (let i = 0; i < 20; i++) {
                 const heart = document.createElement('div');
                 heart.classList.add('floating-heart');
-                heart.innerHTML = ['❤️', '💖', '💕', '✨'][Math.floor(Math.random() * 4)];
+                heart.innerHTML = ['❤️', '💖', '💕'][Math.floor(Math.random() * 3)];
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.top = '100vh';
                 heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
@@ -143,4 +171,4 @@
         }
     </script>
 </body>
-</html>
+        </html>
